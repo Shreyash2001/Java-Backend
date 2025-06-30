@@ -25,7 +25,7 @@ public class Expense {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private UserInfo user;
 
     private LocalDateTime createdAt = LocalDateTime.now();
 }

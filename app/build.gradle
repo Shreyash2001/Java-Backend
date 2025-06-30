@@ -27,6 +27,8 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-oauth2-resource-server:$springBootVersion"
     implementation "org.springframework.boot:spring-boot-starter-security:$springBootVersion"
     implementation "org.springframework.boot:spring-boot-starter:$springBootVersion"
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
     implementation "org.springframework.cloud:spring-cloud-starter-bootstrap:4.1.1"
 
@@ -44,6 +46,10 @@ dependencies {
     testImplementation "org.projectlombok:lombok:$lombokVersion"
 
     testImplementation libs.junit
+}
+
+tasks.withType(JavaCompile) {
+    options.annotationProcessorPath = configurations.annotationProcessor
 }
 
 
