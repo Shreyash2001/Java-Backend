@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -56,6 +57,47 @@ public class CategoryService {
         UserInfo userInfo = userRepository.findByUsername((username));
         logger.info("Fetching categories");
         return categoryRepository.findByUserId(userInfo.getUserId()).stream().map(categoryMapper::toDto).collect(Collectors.toList());
+    }
+
+    public CategoryResponse getCategoryById(String id) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserInfo userInfo = userRepository.findByUsername(username);
+        Optional<Category> category = categoryRepository.findById(id);
+        if(!category.isPresent()) {
+            throw new RuntimeException("Category not found!!");
+        }
+        Category categoryObj = category.get();
+        if(!categoryObj.getUserInfo().getUserId().equals(userInfo.getUserId())) {
+            logger.warning("Unautherized access to category");
+            throw new RuntimeException("Unauthorized");
+        }
+
+        logger.info("Fetched category with ID");
+        return categoryMapper.toDto(categoryObj);
+
+    }
+
+    @Transactional
+    public CategoryResponse updateCategory(String id, CreateCategoryRequest request) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserInfo userInfo = userRepository.findByUsername(username);
+
+        Optional<Category> category = categoryRepository.findById(id);
+        if(!category.isPresent()) {
+            throw new RuntimeException("Category not found!!");
+        }
+        Category categoryObj = category.get();
+        categoryRepository.findByNameAndUserId(request.getName(), userInfo.getUserId()).filter(existing -> !existing.getId().equals(id))
+                .ifPresent(existing -> {
+                    logger.warning("Category name already exist");
+                    throw new RuntimeException("Category name already exist");
+                });
+
+        categoryObj.setName(request.getName());
+        categoryObj.setUpdatedAt(LocalDateTime.now());
+
+        Category updatedCategory = categoryRepository.save(categoryObj);
+        return categoryMapper.toDto(updatedCategory);
     }
 
 }
