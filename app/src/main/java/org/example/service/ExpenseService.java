@@ -1,8 +1,12 @@
 package org.example.service;
 
+import jakarta.transaction.Transactional;
 import org.apache.catalina.User;
+import org.example.entities.Category;
 import org.example.entities.Expense;
 import org.example.entities.UserInfo;
+import org.example.objectmapper.ExpenseMapper;
+import org.example.repository.CategoryRepository;
 import org.example.repository.ExpenseRepository;
 import org.example.repository.UserRepository;
 import org.example.request.CreateExpenseRequest;
@@ -10,6 +14,10 @@ import org.example.response.ExpenseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ExpenseService {
@@ -22,12 +30,20 @@ public class ExpenseService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private ExpenseMapper expenseMapper;
+
+    @Transactional
     public ExpenseResponse createExpense(CreateExpenseRequest request) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UserInfo user = userRepository.findByUsername(username);
-        Category category = categoryRepository.findById(request.getCategoryId());
+        Optional<Category> category = categoryRepository.findById(request.getCategoryId());
 
-        if(!category.getUser().getId().equals(user.getUserId())) {
+        if(category.isEmpty()) {
+            throw new RuntimeException("Category is not present");
+        }
+        Category categoryObj = category.get();
+        if(!categoryObj.getUserInfo().getUserId().equals(user.getUserId())) {
             throw new RuntimeException("Category does not belong to user");
         }
 
@@ -35,22 +51,27 @@ public class ExpenseService {
         expense.setDescription(request.getDescription());
         expense.setAmount(request.getAmount());
         expense.setDate(request.getDate());
-        expense.setCategory(category);
+        expense.setCategory(categoryObj);
         expense.setUser(user);
 
         Expense savedExpense = expenseRepository.save(expense);
 
-        return mapToResponse(savedExpense);
+        return expenseMapper.toDto(savedExpense);
     }
 
-    private ExpenseResponse mapToResponse(Expense expense) {
-        ExpenseResponse response = new ExpenseResponse();
-        response.setId(expense.getId());
-        response.setDescription(expense.getDescription());
-        response.setAmount(expense.getAmount());
-        response.setDate(expense.getDate());
-        response.setCategoryName(expense.getCategory().getName());
-        response.setCreatedAt(expense.getCreatedAt());
-        return response;
+    public List<ExpenseResponse> getExpensesByUser(String categoryId) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserInfo userInfo = userRepository.findByUsername(username);
+        List<Expense> expenses = expenseRepository.findByUserIdAndCategoryId(userInfo.getUserId(), categoryId);
+        return expenses.stream().map(expenseMapper::toDto).collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void deleteExpense(Long id) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserInfo userInfo = userRepository.findByUsername(username);
+        Optional<Expense> expense = expenseRepository.findById(id);
+        if(expense.isEmpty()) throw new RuntimeException("Expense deleted with ID" + id);
+        expenseRepository.deleteById(id);
     }
 }

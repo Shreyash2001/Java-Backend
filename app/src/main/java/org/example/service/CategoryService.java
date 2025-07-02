@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
 import java.util.stream.Collectors;
 
 @Service
@@ -68,7 +68,7 @@ public class CategoryService {
         }
         Category categoryObj = category.get();
         if(!categoryObj.getUserInfo().getUserId().equals(userInfo.getUserId())) {
-            logger.warning("Unautherized access to category");
+            logger.warn("Unautherized access to category");
             throw new RuntimeException("Unauthorized");
         }
 
@@ -89,7 +89,7 @@ public class CategoryService {
         Category categoryObj = category.get();
         categoryRepository.findByNameAndUserId(request.getName(), userInfo.getUserId()).filter(existing -> !existing.getId().equals(id))
                 .ifPresent(existing -> {
-                    logger.warning("Category name already exist");
+                    logger.warn("Category name already exist");
                     throw new RuntimeException("Category name already exist");
                 });
 
@@ -98,6 +98,23 @@ public class CategoryService {
 
         Category updatedCategory = categoryRepository.save(categoryObj);
         return categoryMapper.toDto(updatedCategory);
+    }
+
+    @Transactional
+    public void deleteCategory(String id) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserInfo userInfo = userRepository.findByUsername(username);
+        Optional<Category> category = categoryRepository.findById(id);
+        if(!category.isPresent()) {
+            throw new RuntimeException("Category not found!!!");
+        }
+        Category categoryObj = category.get();
+        if(!categoryObj.getUserInfo().getUserId().equals(userInfo.getUserId())) {
+            logger.warn("Unauthorized delete attempted!!!");
+            throw new RuntimeException("Unauthorized");
+        }
+        categoryRepository.deleteById(id);
+        logger.info("Category deleted with ID" + id);
     }
 
 }

@@ -21,5 +21,5 @@ public class CreateExpenseRequest {
     private LocalDateTime date;
 
     @NotNull(message = "Category ID is required")
-    private Long categoryId;
+    private String categoryId;
 }
