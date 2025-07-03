@@ -37,7 +37,7 @@ public class CategoryService {
         logger.info("Creating Category: {}");
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UserInfo user = userRepository.findByUsername(username);
-        categoryRepository.findByNameAndUserId(request.getName(), user.getUserId()).ifPresent(category -> {
+        categoryRepository.findByNameAndUserInfo_UserId(request.getName(), user.getUserId()).ifPresent(category -> {
             throw new RuntimeException("Category name already exists");
         });
 
@@ -56,7 +56,7 @@ public class CategoryService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UserInfo userInfo = userRepository.findByUsername((username));
         logger.info("Fetching categories");
-        return categoryRepository.findByUserId(userInfo.getUserId()).stream().map(categoryMapper::toDto).collect(Collectors.toList());
+        return categoryRepository.findByUserInfo(userInfo).stream().map(categoryMapper::toDto).collect(Collectors.toList());
     }
 
     public CategoryResponse getCategoryById(String id) {
@@ -87,7 +87,7 @@ public class CategoryService {
             throw new RuntimeException("Category not found!!");
         }
         Category categoryObj = category.get();
-        categoryRepository.findByNameAndUserId(request.getName(), userInfo.getUserId()).filter(existing -> !existing.getId().equals(id))
+        categoryRepository.findByNameAndUserInfo_UserId(request.getName(), userInfo.getUserId()).filter(existing -> !existing.getId().equals(id))
                 .ifPresent(existing -> {
                     logger.warn("Category name already exist");
                     throw new RuntimeException("Category name already exist");

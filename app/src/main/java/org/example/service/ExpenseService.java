@@ -59,10 +59,10 @@ public class ExpenseService {
         return expenseMapper.toDto(savedExpense);
     }
 
-    public List<ExpenseResponse> getExpensesByUser(String categoryId) {
+    public List<ExpenseResponse> getExpensesByUser(Long categoryId) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UserInfo userInfo = userRepository.findByUsername(username);
-        List<Expense> expenses = expenseRepository.findByUserIdAndCategoryId(userInfo.getUserId(), categoryId);
+        List<Expense> expenses = expenseRepository.findByUser_UserIdAndCategory_Id(userInfo.getUserId(), categoryId);
         return expenses.stream().map(expenseMapper::toDto).collect(Collectors.toList());
     }
 
