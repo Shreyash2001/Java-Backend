@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class CategoryResponse {
-    private Long id;
+    private Long Id;
     private String name;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

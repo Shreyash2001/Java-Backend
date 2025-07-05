@@ -56,7 +56,10 @@ public class CategoryService {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UserInfo userInfo = userRepository.findByUsername((username));
         logger.info("Fetching categories");
-        return categoryRepository.findByUserInfo(userInfo).stream().map(categoryMapper::toDto).collect(Collectors.toList());
+        return categoryRepository.findByUserInfo(userInfo).stream().map(category -> {
+            System.out.println(category);
+            return categoryMapper.toDto(category);
+        }).collect(Collectors.toList());
     }
 
     public CategoryResponse getCategoryById(String id) {
@@ -116,5 +119,7 @@ public class CategoryService {
         categoryRepository.deleteById(id);
         logger.info("Category deleted with ID" + id);
     }
+
+
 
 }

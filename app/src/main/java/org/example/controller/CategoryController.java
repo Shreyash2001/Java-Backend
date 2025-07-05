@@ -1,6 +1,9 @@
 package org.example.controller;
 
 import jakarta.validation.Valid;
+import org.example.entities.Category;
+import org.example.entities.UserInfo;
+import org.example.objectmapper.CategoryMapper;
 import org.example.request.CreateCategoryRequest;
 import org.example.response.CategoryResponse;
 import org.example.service.CategoryService;
@@ -9,13 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import org.slf4j.Logger;
 
 @RestController
 @RequestMapping("/api/categories")
 public class CategoryController {
-
+    @Autowired
+    private CategoryMapper categoryMapper;
     private static final Logger logger = (Logger) LoggerFactory.getLogger(CategoryController.class);
 
     @Autowired
@@ -24,6 +29,7 @@ public class CategoryController {
     @PostMapping
     public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CreateCategoryRequest request) {
         logger.info("Received request to create category");
+        System.out.println("i am here");
         CategoryResponse categoryResponse = categoryService.createCategory(request);
         return ResponseEntity.ok(categoryResponse);
     }
@@ -54,5 +60,19 @@ public class CategoryController {
         logger.info("Received request to delete category by id" + id);
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/test-mapper")
+    public ResponseEntity<CategoryResponse> testMapper() {
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("Test Category");
+        category.setCreatedAt(LocalDateTime.now());
+        category.setUpdatedAt(LocalDateTime.now());
+        // Set userInfo if needed, or leave null if not mapped
+        category.setUserInfo(new UserInfo()); // Adjust based on UserInfo structure
+        CategoryResponse response = categoryMapper.toDto(category);
+        logger.info("Mapped response: {}", response);
+        return ResponseEntity.ok(response);
     }
 }

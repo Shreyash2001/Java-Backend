@@ -28,7 +28,7 @@ public class ExpenseController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ExpenseResponse>> getExpenses(@RequestParam(required = false) Long categoryId) {
+    public ResponseEntity<List<ExpenseResponse>> getExpenses(@RequestParam(name = "categoryId", required = false) Long categoryId) {
         logger.info("Received request to get expenses");
         List<ExpenseResponse> expenses = expenseService.getExpensesByUser(categoryId);
         return ResponseEntity.ok(expenses);
