@@ -14,6 +14,8 @@ import org.example.repository.UserRepository;
 import org.example.request.CreateExpenseRequest;
 import org.example.response.ExpenseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -119,5 +121,27 @@ public class ExpenseService {
             return cb.and(predicates.toArray(new Predicate[0]));
         });
         return expenses.stream().map(expenseMapper::toDto).collect(Collectors.toList());
+    }
+
+    public Page<ExpenseResponse> searchExpensePaginated(Long categoryId,
+                                                        Double minAmount,
+                                                        Double maxAmount,
+                                                        LocalDateTime startDate,
+                                                        LocalDateTime endDate,
+                                                        String keyword, Pageable pageable) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserInfo userInfo = userRepository.findByUsername(username);
+        Page<Expense> expenses = expenseRepository.findAll((root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add((Predicate) cb.equal(root.get("user").get("userId"), userInfo.getUserId()));
+            if(categoryId != null) predicates.add((Predicate) cb.equal(root.get("category").get("id"), categoryId));
+            if(minAmount != null) predicates.add((Predicate) cb.ge(root.get("amount"), minAmount));
+            if(maxAmount != null) predicates.add((Predicate) cb.le(root.get("amount"), maxAmount));
+            if(startDate != null) predicates.add((Predicate) cb.greaterThanOrEqualTo(root.get("date"), startDate));
+            if(endDate != null) predicates.add((Predicate) cb.lessThanOrEqualTo(root.get("date"), endDate));
+            if(keyword != null) predicates.add((Predicate) cb.like(cb.lower(root.get("description")), "%" + keyword.toLowerCase() + "%"));
+            return cb.and(predicates.toArray(new Predicate[0]));
+        }, pageable);
+        return expenses.map(expenseMapper::toDto);
     }
 }
