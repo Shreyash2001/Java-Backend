@@ -12,3 +12,10 @@ plugins {
 
 rootProject.name = 'AuthBackend'
 include('app')
+
+include 'auth-service'
+include 'expense-service'
+include 'category-service'
+include 'config-server'
+include 'eureka-server'
+include 'api-gateway'

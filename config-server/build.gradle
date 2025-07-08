@@ -1,0 +1,32 @@
+plugins {
+    id 'org.springframework.boot' version '3.2.4'
+    id 'java'
+}
+
+group = 'org.example'
+version = 'unspecified'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+ext {
+    lombokVersion = '1.18.30'
+    springBootVersion = '3.2.4'
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    implementation 'org.springframework.cloud:spring-cloud-config-server:4.1.0'
+    implementation "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
+}
+
+test {
+    useJUnitPlatform()
+}
