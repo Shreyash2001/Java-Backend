@@ -5,5 +5,5 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/your-repo/expense-tracker-config
+          uri: https://github.com/Shreyash2001/tracker-config
           clone-on-start: true
