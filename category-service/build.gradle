@@ -1,4 +1,5 @@
 plugins {
+    id 'org.springframework.boot' version '3.2.0'
     id 'java'
 }
 
@@ -9,9 +10,27 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    lombokVersion = '1.18.30'
+    springBootVersion = '3.2.4'
+}
+
 dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-web:$springBootVersion"
+    implementation "org.springframework.boot:spring-boot-starter-data-mongodb:$springBootVersion"
+    implementation "org.springframework.boot:spring-boot-starter-data-jpa:$springBootVersion"
+    implementation "org.springframework.boot:spring-boot-starter-security:$springBootVersion"
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client:4.1.0'
+    implementation 'org.springframework.cloud:spring-cloud-starter-config:4.1.0'
+    implementation "org.springframework.boot:spring-boot-starter-amqp:$springBootVersion"
+    implementation 'com.google.code.gson:gson:2.10.1'
+    implementation "org.springframework.boot:spring-boot-starter-actuator:$springBootVersion"
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
+    compileOnly "org.projectlombok:lombok:$lombokVersion"
+    annotationProcessor "org.projectlombok:lombok:$lombokVersion"
+    testAnnotationProcessor "org.projectlombok:lombok:$lombokVersion"
+    testImplementation "org.projectlombok:lombok:$lombokVersion"
 }
 
 test {

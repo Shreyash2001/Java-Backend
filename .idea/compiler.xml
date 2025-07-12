@@ -17,6 +17,10 @@
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.30/f195ee86e6c896ea47a1d39defbe20eb59cd149d/lombok-1.18.30.jar" />
         </processorPath>
         <module name="AuthBackend.auth-service.test" />
+        <module name="AuthBackend.expense-service.main" />
+        <module name="AuthBackend.category-service.main" />
+        <module name="AuthBackend.category-service.test" />
+        <module name="AuthBackend.expense-service.test" />
         <module name="AuthBackend.auth-service.main" />
       </profile>
     </annotationProcessing>
@@ -27,9 +31,15 @@
       <module name="AuthBackend.auth-service" options="-parameters" />
       <module name="AuthBackend.auth-service.main" options="-parameters" />
       <module name="AuthBackend.auth-service.test" options="-parameters" />
+      <module name="AuthBackend.category-service" options="-parameters" />
+      <module name="AuthBackend.category-service.main" options="-parameters" />
+      <module name="AuthBackend.category-service.test" options="-parameters" />
       <module name="AuthBackend.config-server" options="-parameters" />
       <module name="AuthBackend.config-server.main" options="-parameters" />
       <module name="AuthBackend.config-server.test" options="-parameters" />
+      <module name="AuthBackend.expense-service" options="-parameters" />
+      <module name="AuthBackend.expense-service.main" options="-parameters" />
+      <module name="AuthBackend.expense-service.test" options="-parameters" />
     </option>
   </component>
 </project>
