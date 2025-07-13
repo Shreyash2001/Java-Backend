@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    config:
+      uri: http://localhost:8888
+      fail-fast: true
+    gateway:
+      routes:
+        - id: auth-service
+          uri: lb://AUTH-SERVICE
+          predicates:
+            - Path=/auth/**
+          filters:
+            - StripPrefix=1
+        - id: expense-service
+          uri: lb://EXPENSE-SERVICE
+          predicates:
+            - Path=/expenses/**
+          filters:
+            - StripPrefix=1
+            - JwtFilter
+        - id: category-service
+          uri: lb://CATEGORY-SERVICE
+          predicates:
+            - Path=/categories/**
+          filters:
+            - StripPrefix=1
+            - JwtFilter
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
